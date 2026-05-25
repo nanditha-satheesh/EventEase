@@ -1,0 +1,53 @@
+@page "/attendance"
+@rendermode InteractiveServer
+@inject EventStateService EventState
+
+<PageTitle>Attendance</PageTitle>
+
+<h1>Attendance Tracker</h1>
+<p class="text-secondary">Mark attendees as present during the event.</p>
+
+@if (EventState.Registrations.Count == 0)
+{
+    <div class="alert alert-info">No registrations yet. Add attendees from the Register page.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Event</th>
+                    <th>Present</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in EventState.Registrations)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>@item.Email</td>
+                        <td>@item.EventTitle</td>
+                        <td>
+                            <input type="checkbox"
+                                   class="form-check-input"
+                                   checked="@item.Attended"
+                                   @onchange="args => ToggleAttendance(item.Id, args.Value as bool? == true)" />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <p><strong>@EventState.Registrations.Count(x => x.Attended)</strong> of <strong>@EventState.Registrations.Count</strong> attendees marked present.</p>
+}
+
+@code {
+    private void ToggleAttendance(int registrationId, bool attended)
+    {
+        EventState.UpdateAttendance(registrationId, attended);
+    }
+}

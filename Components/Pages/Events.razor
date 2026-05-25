@@ -1,0 +1,14 @@
+@page "/events"
+@inject EventEase.Services.EventStateService EventState
+
+<PageTitle>Events</PageTitle>
+
+<h1>Upcoming Events</h1>
+<p class="text-secondary">Choose an event and continue to registration.</p>
+
+<div class="event-grid">
+    @foreach (var item in EventState.Events)
+    {
+        <EventCard Event="item" />
+    }
+</div>

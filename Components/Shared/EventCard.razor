@@ -1,0 +1,21 @@
+@using EventEase.Models
+
+<article class="event-card">
+    <div class="event-card__header">
+        <h3>@Event.Title</h3>
+        <span class="badge text-bg-light">@Event.Date</span>
+    </div>
+    <p class="event-card__venue">📍 @Event.Venue</p>
+    <p>@Event.Description</p>
+    <div class="event-card__footer">
+        <span>@Event.RegisteredCount / @Event.Capacity registered</span>
+        <span class="badge rounded-pill @(Event.RegisteredCount >= Event.Capacity ? "text-bg-danger" : "text-bg-success")">
+            @(Event.RegisteredCount >= Event.Capacity ? "Full" : "Open")
+        </span>
+    </div>
+</article>
+
+@code {
+    [Parameter]
+    public required EventInfo Event { get; init; }
+}

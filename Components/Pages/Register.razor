@@ -1,0 +1,69 @@
+@page "/register"
+@rendermode InteractiveServer
+@inject EventEase.Services.EventStateService EventState
+
+<PageTitle>Register</PageTitle>
+
+<h1>Event Registration</h1>
+<p class="text-secondary">Fill in your details to reserve a seat.</p>
+
+<EditForm Model="Registration" OnValidSubmit="HandleSubmit" FormName="RegistrationForm" class="registration-form">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label class="form-label" for="event">Event</label>
+        <InputSelect id="event" class="form-select" @bind-Value="Registration.EventId">
+            <option value="">Select an event</option>
+            @foreach (var item in EventState.Events)
+            {
+                <option value="@item.Id">@item.Title (@item.Date)</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="() => Registration.EventId" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" for="name">Name</label>
+        <InputText id="name" class="form-control" @bind-Value="Registration.Name" />
+        <ValidationMessage For="() => Registration.Name" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" for="email">Email</label>
+        <InputText id="email" class="form-control" @bind-Value="Registration.Email" />
+        <ValidationMessage For="() => Registration.Email" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" for="notes">Notes (optional)</label>
+        <InputTextArea id="notes" class="form-control" @bind-Value="Registration.Notes" />
+        <ValidationMessage For="() => Registration.Notes" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit Registration</button>
+</EditForm>
+
+@if (!string.IsNullOrWhiteSpace(StatusMessage))
+{
+    <div class="alert @(WasSuccessful ? "alert-success" : "alert-danger") mt-3" role="alert">
+        @StatusMessage
+    </div>
+}
+
+@code {
+    private EventEase.Models.RegistrationRequest Registration { get; set; } = new();
+    private string StatusMessage { get; set; } = string.Empty;
+    private bool WasSuccessful { get; set; }
+
+    private void HandleSubmit()
+    {
+        WasSuccessful = EventState.Register(Registration, out var message);
+        StatusMessage = message;
+
+        if (WasSuccessful)
+        {
+            Registration = new EventEase.Models.RegistrationRequest();
+        }
+    }
+}
