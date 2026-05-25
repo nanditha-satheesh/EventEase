@@ -1,0 +1,186 @@
+@page "/attendance"
+@using EventEase.Models
+@using EventEase.Services
+@inject AppState AppState
+
+<PageTitle>Attendance - EventEase</PageTitle>
+
+<div class="attendance-page">
+    <div class="page-header">
+        <h1 class="page-title">Attendance Tracker</h1>
+        <p class="page-subtitle">Manage and track event attendance</p>
+    </div>
+
+    <!-- Statistics Dashboard -->
+    <div class="stats-dashboard">
+        <div class="stat-card stat-primary">
+            <div class="stat-icon">👥</div>
+            <div class="stat-content">
+                <div class="stat-value">@stats.Total</div>
+                <div class="stat-label">Total Registrations</div>
+            </div>
+        </div>
+
+        <div class="stat-card stat-success">
+            <div class="stat-icon">✓</div>
+            <div class="stat-content">
+                <div class="stat-value">@stats.Present</div>
+                <div class="stat-label">Present</div>
+            </div>
+        </div>
+
+        <div class="stat-card stat-warning">
+            <div class="stat-icon">✗</div>
+            <div class="stat-content">
+                <div class="stat-value">@stats.Absent</div>
+                <div class="stat-label">Absent</div>
+            </div>
+        </div>
+
+        <div class="stat-card stat-info">
+            <div class="stat-icon">📊</div>
+            <div class="stat-content">
+                <div class="stat-value">@attendancePercentage%</div>
+                <div class="stat-label">Attendance Rate</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registrations List -->
+    @if (registrations.Count == 0)
+    {
+        <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <h3>No Registrations Yet</h3>
+            <p>There are no event registrations to display. Start by registering for an event!</p>
+            <button class="btn-primary" @onclick='() => Navigation.NavigateTo("/register")'>
+                Register Now
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="attendance-section">
+            <div class="section-header">
+                <h2>Registered Attendees</h2>
+                <div class="filter-buttons">
+                    <button class="filter-btn @(filter == "all" ? "active" : "")" @onclick='() => SetFilter("all")'>
+                        All (@registrations.Count)
+                    </button>
+                    <button class="filter-btn @(filter == "present" ? "active" : "")" @onclick='() => SetFilter("present")'>
+                        Present (@stats.Present)
+                    </button>
+                    <button class="filter-btn @(filter == "absent" ? "active" : "")" @onclick='() => SetFilter("absent")'>
+                        Absent (@stats.Absent)
+                    </button>
+                </div>
+            </div>
+
+            <div class="attendance-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Event</th>
+                            <th>Registration Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var registration in filteredRegistrations)
+                        {
+                            <tr class="@(registration.IsAttending ? "present" : "absent")">
+                                <td>@registration.Id</td>
+                                <td>
+                                    <div class="attendee-info">
+                                        <div class="attendee-avatar">@GetInitials(registration.FullName)</div>
+                                        <span>@registration.FullName</span>
+                                    </div>
+                                </td>
+                                <td>@registration.Email</td>
+                                <td>@registration.Phone</td>
+                                <td>@registration.SelectedEventName</td>
+                                <td>@registration.RegistrationDate.ToString("MMM dd, yyyy")</td>
+                                <td>
+                                    <span class="status-badge @(registration.IsAttending ? "status-present" : "status-absent")">
+                                        @(registration.IsAttending ? "Present" : "Absent")
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn-toggle" @onclick="() => ToggleAttendance(registration.Id)">
+                                        @(registration.IsAttending ? "Mark Absent" : "Mark Present")
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Inject] private NavigationManager Navigation { get; set; } = default!;
+
+    private List<Registration> registrations = new();
+    private List<Registration> filteredRegistrations = new();
+    private (int Total, int Present, int Absent) stats;
+    private int attendancePercentage = 0;
+    private string filter = "all";
+
+    protected override void OnInitialized()
+    {
+        LoadData();
+        AppState.OnChange += StateHasChanged;
+    }
+
+    private void LoadData()
+    {
+        registrations = AppState.GetAllRegistrations();
+        stats = AppState.GetAttendanceStats();
+        attendancePercentage = stats.Total > 0 ? (int)((stats.Present * 100.0) / stats.Total) : 0;
+        ApplyFilter();
+    }
+
+    private void SetFilter(string newFilter)
+    {
+        filter = newFilter;
+        ApplyFilter();
+    }
+
+    private void ApplyFilter()
+    {
+        filteredRegistrations = filter switch
+        {
+            "present" => registrations.Where(r => r.IsAttending).ToList(),
+            "absent" => registrations.Where(r => !r.IsAttending).ToList(),
+            _ => registrations
+        };
+    }
+
+    private void ToggleAttendance(int registrationId)
+    {
+        AppState.ToggleAttendance(registrationId);
+        LoadData();
+    }
+
+    private string GetInitials(string fullName)
+    {
+        var parts = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length >= 2)
+        {
+            return $"{parts[0][0]}{parts[1][0]}".ToUpper();
+        }
+        return parts.Length > 0 ? parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper() : "??";
+    }
+
+    public void Dispose()
+    {
+        AppState.OnChange -= StateHasChanged;
+    }
+}

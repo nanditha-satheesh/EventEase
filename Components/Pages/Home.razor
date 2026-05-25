@@ -1,0 +1,133 @@
+﻿@page "/"
+@using EventEase.Models
+@using EventEase.Services
+@inject AppState AppState
+@inject NavigationManager Navigation
+
+<PageTitle>EventEase - Home</PageTitle>
+
+<div class="home-container">
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">Welcome to EventEase</h1>
+            <p class="hero-subtitle">Your Gateway to Amazing Events</p>
+            <p class="hero-description">
+                Discover, register, and attend the most exciting events in your area. 
+                From tech conferences to music festivals, we've got you covered!
+            </p>
+            <div class="hero-actions">
+                <button class="btn-primary-large" @onclick='() => Navigation.NavigateTo("/events")'>
+                    Browse Events
+                </button>
+                <button class="btn-secondary-large" @onclick='() => Navigation.NavigateTo("/register")'>
+                    Register Now
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <h2 class="section-title">Why Choose EventEase?</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Easy Registration</h3>
+                <p>Quick and simple event registration process with instant confirmation</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h3>Discover Events</h3>
+                <p>Browse through a wide variety of events across multiple categories</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Track Attendance</h3>
+                <p>Keep track of your registrations and manage your attendance easily</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">✨</div>
+                <h3>Modern Experience</h3>
+                <p>Enjoy a clean, responsive interface that works on all devices</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Events Section -->
+    <section class="featured-events-section">
+        <div class="section-header">
+            <h2 class="section-title">Featured Events</h2>
+            <button class="btn-link" @onclick='() => Navigation.NavigateTo("/events")'>
+                View All Events →
+            </button>
+        </div>
+
+        <div class="events-grid">
+            @foreach (var eventItem in featuredEvents)
+            {
+                <EventCard EventData="@eventItem" 
+                          ShowRegisterButton="true"
+                          OnRegisterClicked="HandleRegister" />
+            }
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">@totalEvents</div>
+                <div class="stat-label">Total Events</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">@totalRegistrations</div>
+                <div class="stat-label">Registrations</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">@totalCategories</div>
+                <div class="stat-label">Categories</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">@attendanceRate%</div>
+                <div class="stat-label">Attendance Rate</div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@code {
+    private List<Event> featuredEvents = new();
+    private int totalEvents = 0;
+    private int totalRegistrations = 0;
+    private int totalCategories = 0;
+    private int attendanceRate = 0;
+
+    protected override void OnInitialized()
+    {
+        // Load featured events (first 3)
+        featuredEvents = AppState.GetAllEvents().Take(3).ToList();
+
+        // Calculate statistics
+        totalEvents = AppState.GetAllEvents().Count;
+        totalRegistrations = AppState.GetAllRegistrations().Count;
+        totalCategories = AppState.GetCategories().Count;
+
+        var stats = AppState.GetAttendanceStats();
+        attendanceRate = stats.Total > 0 ? (int)((stats.Present * 100.0) / stats.Total) : 85;
+
+        // Subscribe to state changes for real-time updates
+        AppState.OnChange += StateHasChanged;
+    }
+
+    private void HandleRegister(Event eventItem)
+    {
+        AppState.SetSelectedEvent(eventItem);
+        Navigation.NavigateTo("/register");
+    }
+
+    public void Dispose()
+    {
+        AppState.OnChange -= StateHasChanged;
+    }
+}

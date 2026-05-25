@@ -1,0 +1,134 @@
+@page "/events"
+@using EventEase.Models
+@using EventEase.Services
+@inject AppState AppState
+@inject NavigationManager Navigation
+
+<PageTitle>Events - EventEase</PageTitle>
+
+<div class="events-page">
+    <div class="page-header">
+        <h1 class="page-title">Discover Events</h1>
+        <p class="page-subtitle">Find and register for exciting events near you</p>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="filter-section">
+        <div class="search-box">
+            <input type="text" 
+                   class="search-input" 
+                   placeholder="🔍 Search events by name, description, or location..." 
+                   @bind="searchTerm"
+                   @bind:event="oninput"
+                   @bind:after="FilterEvents" />
+        </div>
+
+        <div class="filter-controls">
+            <label class="filter-label">Category:</label>
+            <select class="filter-select" @bind="selectedCategory" @bind:after="FilterEvents">
+                <option value="All">All Categories</option>
+                @foreach (var category in categories)
+                {
+                    <option value="@category">@category</option>
+                }
+            </select>
+
+            <button class="btn-filter-reset" @onclick="ResetFilters">
+                Clear Filters
+            </button>
+        </div>
+
+        <div class="results-info">
+            <span class="results-count">Showing @filteredEvents.Count of @allEvents.Count events</span>
+        </div>
+    </div>
+
+    <!-- Events Display -->
+    @if (isLoading)
+    {
+        <div class="loading-container">
+            <div class="spinner"></div>
+            <p>Loading events...</p>
+        </div>
+    }
+    else if (filteredEvents.Count == 0)
+    {
+        <div class="no-results">
+            <div class="no-results-icon">🔍</div>
+            <h3>No events found</h3>
+            <p>Try adjusting your search criteria or browse all events</p>
+            <button class="btn-primary" @onclick="ResetFilters">View All Events</button>
+        </div>
+    }
+    else
+    {
+        <div class="events-grid">
+            @foreach (var eventItem in filteredEvents)
+            {
+                <EventCard EventData="@eventItem" 
+                          ShowRegisterButton="true"
+                          OnRegisterClicked="HandleRegister"
+                          @bind-IsSelected="@selectedEventIds[eventItem.Id]" />
+            }
+        </div>
+    }
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <button class="btn-secondary" @onclick='() => Navigation.NavigateTo("/")'>
+            ← Back to Home
+        </button>
+        <button class="btn-primary" @onclick='() => Navigation.NavigateTo("/register")'>
+            Register for Event
+        </button>
+    </div>
+</div>
+
+@code {
+    private List<Event> allEvents = new();
+    private List<Event> filteredEvents = new();
+    private List<string> categories = new();
+    private Dictionary<int, bool> selectedEventIds = new();
+    
+    private string searchTerm = string.Empty;
+    private string selectedCategory = "All";
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Simulate loading delay for better UX
+        await Task.Delay(500);
+
+        // Load all events
+        allEvents = AppState.GetAllEvents();
+        filteredEvents = allEvents;
+        categories = AppState.GetCategories();
+
+        // Initialize selection dictionary
+        foreach (var evt in allEvents)
+        {
+            selectedEventIds[evt.Id] = false;
+        }
+
+        isLoading = false;
+    }
+
+    private void FilterEvents()
+    {
+        filteredEvents = AppState.GetFilteredEvents(searchTerm, selectedCategory);
+        StateHasChanged();
+    }
+
+    private void ResetFilters()
+    {
+        searchTerm = string.Empty;
+        selectedCategory = "All";
+        FilterEvents();
+    }
+
+    private void HandleRegister(Event eventItem)
+    {
+        AppState.SetSelectedEvent(eventItem);
+        Navigation.NavigateTo("/register");
+    }
+}

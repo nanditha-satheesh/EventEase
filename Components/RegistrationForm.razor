@@ -1,0 +1,156 @@
+@using EventEase.Models
+@using EventEase.Services
+@inject AppState AppState
+@inject NavigationManager Navigation
+
+@* Registration Form Component with validation *@
+
+<div class="registration-form-container">
+    <h2 class="form-title">Event Registration</h2>
+    
+    @if (isSubmitted)
+    {
+        <div class="success-message">
+            <div class="success-icon">✓</div>
+            <h3>Registration Successful!</h3>
+            <p>Thank you, <strong>@registration.FullName</strong>!</p>
+            <p>You have been registered for <strong>@registration.SelectedEventName</strong>.</p>
+            <p>A confirmation email has been sent to <strong>@registration.Email</strong>.</p>
+            <button class="btn-primary" @onclick="ResetForm">Register Another</button>
+            <button class="btn-secondary" @onclick='() => Navigation.NavigateTo("/events")'>View Events</button>
+        </div>
+    }
+    else
+    {
+        <EditForm Model="@registration" OnValidSubmit="HandleValidSubmit" FormName="registrationForm">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="validation-summary" />
+
+            <div class="form-group">
+                <label for="fullName" class="form-label">Full Name *</label>
+                <InputText id="fullName" class="form-control" @bind-Value="registration.FullName" placeholder="Enter your full name" />
+                <ValidationMessage For="@(() => registration.FullName)" />
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="form-label">Email Address *</label>
+                <InputText id="email" type="email" class="form-control" @bind-Value="registration.Email" placeholder="your.email@example.com" />
+                <ValidationMessage For="@(() => registration.Email)" />
+            </div>
+
+            <div class="form-group">
+                <label for="phone" class="form-label">Phone Number *</label>
+                <InputText id="phone" class="form-control" @bind-Value="registration.Phone" placeholder="+1 (555) 123-4567" />
+                <ValidationMessage For="@(() => registration.Phone)" />
+            </div>
+
+            <div class="form-group">
+                <label for="eventSelect" class="form-label">Select Event *</label>
+                <InputSelect id="eventSelect" class="form-control" @bind-Value="registration.SelectedEventId" @bind-Value:after="OnEventSelected">
+                    <option value="0">-- Choose an Event --</option>
+                    @foreach (var evt in events)
+                    {
+                        <option value="@evt.Id">@evt.Name - @evt.Date.ToString("MMM dd, yyyy")</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => registration.SelectedEventId)" />
+            </div>
+
+            @if (!string.IsNullOrEmpty(selectedEventDetails))
+            {
+                <div class="event-preview">
+                    <h4>Selected Event Details</h4>
+                    <p>@selectedEventDetails</p>
+                </div>
+            }
+
+            <div class="form-group checkbox-group">
+                <label class="checkbox-label">
+                    <InputCheckbox @bind-Value="registration.AcceptTerms" />
+                    <span>I accept the terms and conditions *</span>
+                </label>
+                <ValidationMessage For="@(() => registration.AcceptTerms)" />
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit" disabled="@isSubmitting">
+                    @if (isSubmitting)
+                    {
+                        <span>Processing...</span>
+                    }
+                    else
+                    {
+                        <span>Submit Registration</span>
+                    }
+                </button>
+                <button type="button" class="btn-cancel" @onclick="ClearForm" disabled="@isSubmitting">
+                    Clear Form
+                </button>
+            </div>
+        </EditForm>
+    }
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Registration registration { get; set; } = new();
+
+    private List<Event> events = new();
+    private bool isSubmitting = false;
+    private bool isSubmitted = false;
+    private string selectedEventDetails = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        // Get all events from AppState
+        events = AppState.GetAllEvents();
+
+        // If there's a selected event in AppState, pre-select it
+        if (AppState.SelectedEvent != null)
+        {
+            registration.SelectedEventId = AppState.SelectedEvent.Id;
+            OnEventSelected();
+        }
+    }
+
+    private void OnEventSelected()
+    {
+        var selectedEvent = AppState.GetEventById(registration.SelectedEventId);
+        if (selectedEvent != null)
+        {
+            registration.SelectedEventName = selectedEvent.Name;
+            selectedEventDetails = $"{selectedEvent.Name} on {selectedEvent.Date:MMM dd, yyyy} at {selectedEvent.Location}";
+        }
+        else
+        {
+            selectedEventDetails = string.Empty;
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        isSubmitting = true;
+        
+        // Simulate processing delay
+        await Task.Delay(1000);
+
+        // Save registration to AppState
+        AppState.AddRegistration(registration);
+
+        isSubmitting = false;
+        isSubmitted = true;
+    }
+
+    private void ClearForm()
+    {
+        registration = new Registration();
+        selectedEventDetails = string.Empty;
+    }
+
+    private void ResetForm()
+    {
+        isSubmitted = false;
+        registration = new Registration();
+        selectedEventDetails = string.Empty;
+    }
+}

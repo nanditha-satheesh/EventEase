@@ -1,0 +1,161 @@
+@page "/about"
+
+<PageTitle>About - EventEase</PageTitle>
+
+<div class="about-page">
+    <div class="page-header">
+        <h1 class="page-title">About EventEase</h1>
+        <p class="page-subtitle">Modern Event Management Made Simple</p>
+    </div>
+
+    <div class="about-content">
+        <section class="about-section">
+            <h2>Project Overview</h2>
+            <p>
+                EventEase is a modern, full-featured Event Management System built with <strong>ASP.NET Core Blazor Web App</strong> 
+                using <strong>.NET 8</strong> and <strong>C#</strong>. This application demonstrates best practices in 
+                web development, including component-based architecture, state management, form validation, and responsive design.
+            </p>
+        </section>
+
+        <section class="about-section">
+            <h2>Key Features</h2>
+            <ul class="features-list">
+                <li>🏠 <strong>Interactive Home Page</strong> - Welcoming landing page with featured events and statistics</li>
+                <li>🎯 <strong>Event Browsing</strong> - Browse, search, and filter events by category</li>
+                <li>📝 <strong>Event Registration</strong> - Complete registration form with comprehensive validation</li>
+                <li>📊 <strong>Attendance Tracking</strong> - Real-time attendance management with statistics dashboard</li>
+                <li>🔄 <strong>State Management</strong> - Centralized application state using dependency injection</li>
+                <li>✅ <strong>Form Validation</strong> - Client-side validation using Data Annotations</li>
+                <li>🎨 <strong>Responsive Design</strong> - Mobile-friendly layout that works on all screen sizes</li>
+                <li>⚡ <strong>Performance Optimized</strong> - Efficient rendering and component updates</li>
+            </ul>
+        </section>
+
+        <section class="about-section">
+            <h2>Technologies Used</h2>
+            <div class="tech-grid">
+                <div class="tech-card">
+                    <div class="tech-icon">🔷</div>
+                    <h3>ASP.NET Core</h3>
+                    <p>Blazor Web App framework for building interactive web UIs</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">💻</div>
+                    <h3>.NET 8 & C#</h3>
+                    <p>Latest .NET platform with modern C# language features</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">⚛️</div>
+                    <h3>Razor Components</h3>
+                    <p>Reusable UI components with parameters and data binding</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🎨</div>
+                    <h3>CSS Styling</h3>
+                    <p>Modern, clean UI with responsive design principles</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">💉</div>
+                    <h3>Dependency Injection</h3>
+                    <p>Service-based architecture for state management</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">✅</div>
+                    <h3>Data Validation</h3>
+                    <p>Comprehensive form validation with Data Annotations</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="about-section">
+            <h2>Architecture Highlights</h2>
+            <ul class="architecture-list">
+                <li><strong>Component-Based Design</strong> - Reusable EventCard and RegistrationForm components</li>
+                <li><strong>Model Layer</strong> - Clean separation with Event and Registration models</li>
+                <li><strong>Service Layer</strong> - AppState service for centralized state management</li>
+                <li><strong>Two-Way Data Binding</strong> - Efficient data synchronization between components</li>
+                <li><strong>Routing System</strong> - Client-side routing with NavLink navigation</li>
+                <li><strong>Event Handling</strong> - EventCallback for component communication</li>
+                <li><strong>Form Processing</strong> - EditForm with comprehensive validation</li>
+                <li><strong>Responsive Layout</strong> - Mobile-first CSS design</li>
+            </ul>
+        </section>
+
+        <section class="about-section">
+            <h2>How Microsoft Copilot Assisted</h2>
+            <div class="copilot-section">
+                <div class="copilot-icon">🤖</div>
+                <p>Microsoft Copilot played a crucial role in the development of EventEase:</p>
+                <ul class="copilot-list">
+                    <li><strong>Component Generation</strong> - Copilot helped generate the EventCard component with proper parameters, 
+                        two-way data binding, and responsive styling</li>
+                    <li><strong>Routing Debugging</strong> - Assisted in troubleshooting and implementing proper Blazor routing 
+                        with NavLink navigation</li>
+                    <li><strong>Form Optimization</strong> - Helped optimize the RegistrationForm with EditForm, DataAnnotationsValidator, 
+                        and proper validation messages</li>
+                    <li><strong>Validation Logic</strong> - Copilot assisted in implementing comprehensive validation rules using 
+                        Data Annotations including Required, EmailAddress, Phone, and custom validators</li>
+                    <li><strong>Attendance Tracker</strong> - Helped implement the attendance tracking system with real-time updates, 
+                        filtering, and statistics dashboard</li>
+                    <li><strong>State Management</strong> - Assisted in designing and implementing the AppState service with 
+                        proper event notifications</li>
+                    <li><strong>CSS Styling</strong> - Copilot helped create modern, responsive CSS with hover effects and 
+                        mobile-friendly layouts</li>
+                    <li><strong>Best Practices</strong> - Provided guidance on Blazor best practices including component lifecycle, 
+                        efficient rendering, and proper disposal</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="about-section">
+            <h2>Project Structure</h2>
+            <pre class="code-block">
+EventEase/
+├── Components/
+│   ├── EventCard.razor          (Reusable event card component)
+│   ├── RegistrationForm.razor   (Registration form with validation)
+│   └── Pages/
+│       ├── Home.razor           (Landing page with featured events)
+│       ├── Events.razor         (Event browsing with search/filter)
+│       ├── Register.razor       (Registration page)
+│       ├── Attendance.razor     (Attendance tracking dashboard)
+│       └── About.razor          (This page)
+├── Models/
+│   ├── Event.cs                 (Event data model)
+│   └── Registration.cs          (Registration data model)
+├── Services/
+│   └── AppState.cs              (Application state management)
+├── wwwroot/css/
+│   └── site.css                 (Custom styles)
+└── Program.cs                   (Application configuration)
+            </pre>
+        </section>
+
+        <section class="about-section">
+            <h2>Learning Outcomes</h2>
+            <p>This project demonstrates proficiency in:</p>
+            <ul class="learning-list">
+                <li>Building modern web applications with Blazor</li>
+                <li>Component-based architecture and reusability</li>
+                <li>State management patterns</li>
+                <li>Form handling and validation</li>
+                <li>Routing and navigation</li>
+                <li>Responsive web design</li>
+                <li>Dependency injection</li>
+                <li>Event-driven programming</li>
+            </ul>
+        </section>
+
+        <section class="about-section credits">
+            <h2>Credits</h2>
+            <p>
+                <strong>Developed for:</strong> Microsoft/Coursera Peer-Graded Assignment<br />
+                <strong>Technology:</strong> ASP.NET Core Blazor Web App (.NET 8)<br />
+                <strong>Framework:</strong> Blazor Server with Interactive Components<br />
+                <strong>Language:</strong> C# 12<br />
+                <strong>AI Assistance:</strong> Microsoft Copilot
+            </p>
+        </section>
+    </div>
+</div>

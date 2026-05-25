@@ -1,0 +1,21 @@
+@page "/register"
+@using EventEase.Services
+@inject AppState AppState
+
+<PageTitle>Register - EventEase</PageTitle>
+
+<div class="register-page">
+    <div class="page-header">
+        <h1 class="page-title">Event Registration</h1>
+        <p class="page-subtitle">Fill out the form below to register for an event</p>
+    </div>
+
+    <div class="form-container">
+        <RegistrationForm />
+    </div>
+</div>
+
+@code {
+    // This page hosts the RegistrationForm component
+    // All logic is handled within the component
+}
