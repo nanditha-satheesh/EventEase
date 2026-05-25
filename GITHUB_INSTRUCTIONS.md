@@ -278,7 +278,3 @@ If you encounter issues:
 3. Ask in the course discussion forum
 
 ---
-
-**Good luck with your project submission! 🚀**
-
-*Remember to update your README.md with your actual GitHub username and repository URL!*
